@@ -9,3 +9,14 @@ function EventsPage() {
 }
 
 export default EventsPage;
+
+export async function eventsLoader() {
+  const response = await fetch('http://localhost:8080/events');
+
+  if (!response.ok) {
+    // Later
+  } else {
+    const resData = await response.json();
+    return resData.events;
+  }
+}
