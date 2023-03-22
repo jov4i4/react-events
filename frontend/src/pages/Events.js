@@ -1,34 +1,37 @@
+import { useEffect, useState } from 'react';
+
 import EventsList from '../components/EventsList';
 
-const DUMMY_DATA = [
-  {
-    id: 'e1',
-    title: 'A dummy event1',
-    date: '2023-02-22',
-    image:
-      'https://blog.hubspot.de/hubfs/Germany/Blog_images/Optimize_Marketing%20Events%20DACH%202021.jpg',
-    description: 'Join this amazing event and connect with fellow developers.',
-  },
-  {
-    id: 'e2',
-    title: 'A dummy event2',
-    date: '2023-02-22',
-    image:
-      'https://blog.hubspot.de/hubfs/Germany/Blog_images/Optimize_Marketing%20Events%20DACH%202021.jpg',
-    description: 'Join this amazing event and connect with fellow developers.',
-  },
-  {
-    id: 'e3',
-    title: 'A dummy event3',
-    date: '2023-02-22',
-    image:
-      'https://blog.hubspot.de/hubfs/Germany/Blog_images/Optimize_Marketing%20Events%20DACH%202021.jpg',
-    description: 'Join this amazing event and connect with fellow developers.',
-  },
-];
-
 function EventsPage() {
-  return <EventsList events={DUMMY_DATA} />;
+  const [isLoading, setIsLoading] = useState(false);
+  const [fetchedEvents, setFetchedEvents] = useState();
+  const [error, setError] = useState();
+
+  useEffect(() => {
+    async function fetchEvents() {
+      setIsLoading(true);
+      const response = await fetch('http://localhost:8080/events');
+
+      if (!response.ok) {
+        setError('Fetching events failed.');
+      } else {
+        const resData = await response.json();
+        setFetchedEvents(resData.events);
+      }
+      setIsLoading(false);
+    }
+
+    fetchEvents();
+  }, []);
+  return (
+    <>
+      <div style={{ textAlign: 'center' }}>
+        {isLoading && <p>Loading...</p>}
+        {error && <p>{error}</p>}
+      </div>
+      {!isLoading && fetchedEvents && <EventsList events={fetchedEvents} />}
+    </>
+  );
 }
 
 export default EventsPage;
